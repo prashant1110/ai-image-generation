@@ -1,0 +1,22 @@
+{
+  "name": "backend",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "bun run index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@fal-ai/client": "^1.3.0",
+    "@types/express": "^5.0.1",
+    "common": "*",
+    "db": "*",
+    "express": "^5.1.0"
+  }
+}
