@@ -28,21 +28,23 @@ enum ModelTrainingStatus {
 }
 
 model Model {
-  id             String              @id @default(uuid())
-  name           String
-  type           ModelTypeEnum
-  age            Int
-  ethinicity     EthinicityEnum
-  eyeColor       String
-  bald           Boolean
-  userId         String
-  triggerWord    String?
-  tensorPath     String?
-  trainingStatus ModelTrainingStatus @default(Pending)
-  trainingImages TraningImages[]
-  outputImages   OutputImages[]
-  createdAt      DateTime            @default(now())
-  updatedAt      DateTime            @updatedAt
+  id               String              @id @default(uuid())
+  name             String
+  type             ModelTypeEnum
+  age              Int
+  ethinicity       EthinicityEnum
+  eyeColor         String
+  bald             Boolean
+  userId           String
+  triggerWord      String?
+  tensorPath       String?
+  trainingStatus   ModelTrainingStatus @default(Pending)
+  trainingImages   TraningImages[]
+  outputImages     OutputImages[]
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  falAiRequestedId String
+
 }
 
 model TraningImages {
@@ -53,15 +55,17 @@ model TraningImages {
 }
 
 model OutputImages {
-  id        String     @id @default(uuid())
-  imageUrl  String
-  modelId   String
-  userId    String
-  prompt    String
-  status    StatusEnum @default(Pending)
-  model     Model      @relation(fields: [modelId], references: [id])
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id               String     @id @default(uuid())
+  imageUrl         String
+  modelId          String
+  userId           String
+  prompt           String
+  status           StatusEnum @default(Pending)
+  model            Model      @relation(fields: [modelId], references: [id])
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  falAiRequestedId String
+
 }
 
 model Packs {
