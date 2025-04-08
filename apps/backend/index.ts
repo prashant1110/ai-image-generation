@@ -5,10 +5,25 @@ import {
   GenerateImagesFromPack,
 } from "common/types";
 import { prismaClient } from "db";
+import { FalAIModel } from "./model/FalAIModel";
+import { S3Client } from "bun";
 
 const app = express();
 const PORT = 4000;
 const USER_ID = "123";
+
+const falAiModel = new FalAIModel();
+
+
+app.get("/pre-sign",(req,res)=>{
+  const url = S3Client.prototype.presign("my-file.txt", {
+    expiresIn: 3600,
+  });
+
+  // find a way to store the zip and get url
+
+  res.json({messgae:"ok"});
+})
 
 //training model
 app.post("/ai/training", async (req, res) => {
@@ -21,6 +36,11 @@ app.post("/ai/training", async (req, res) => {
     return;
   }
 
+  const { request_id, response_url } = await falAiModel.trainModel(
+    parsedBody.data.zipUrl,
+    parsedBody.data.name
+  );
+
   const data = await prismaClient.model.create({
     data: {
       name: parsedBody.data?.name,
@@ -30,6 +50,8 @@ app.post("/ai/training", async (req, res) => {
       eyeColor: parsedBody.data?.eyeColor,
       bald: parsedBody.data?.bald,
       userId: USER_ID,
+      falAiRequestedId: request_id,
+      zipUrl: parsedBody.data.zipUrl,
     },
   });
 
@@ -47,12 +69,31 @@ app.post("/ai/generate", async (req, res) => {
     return;
   }
 
+  const model = await prismaClient.model.findUnique({
+    where: {
+      id: parsedBody.data.modelId,
+    },
+  });
+
+  if (!model || !model.tensorPath) {
+    res.status(404).json({
+      message: "Model not found",
+    });
+    return;
+  }
+
+  const { request_id, response_url } = await falAiModel.generateImage(
+    parsedBody.data.prompt,
+    model?.tensorPath
+  );
+
   const data = await prismaClient.outputImages.create({
     data: {
       userId: USER_ID,
       prompt: parsedBody.data.prompt,
       modelId: parsedBody.data.modelId,
       imageUrl: "",
+      falAiRequestedId: request_id,
     },
   });
 

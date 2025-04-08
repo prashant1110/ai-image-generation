@@ -39,21 +39,12 @@ model Model {
   triggerWord      String?
   tensorPath       String?
   trainingStatus   ModelTrainingStatus @default(Pending)
-  trainingImages   TraningImages[]
   outputImages     OutputImages[]
   createdAt        DateTime            @default(now())
   updatedAt        DateTime            @updatedAt
-  falAiRequestedId String
-
+  falAiRequestedId String?
+  zipUrl           String
 }
-
-model TraningImages {
-  id       String @id @default(uuid())
-  imageUrl String
-  modelId  String
-  model    Model  @relation(fields: [modelId], references: [id])
-}
-
 model OutputImages {
   id               String     @id @default(uuid())
   imageUrl         String
@@ -64,8 +55,7 @@ model OutputImages {
   model            Model      @relation(fields: [modelId], references: [id])
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
-  falAiRequestedId String
-
+  falAiRequestedId String?
 }
 
 model Packs {
