@@ -14,16 +14,20 @@ const USER_ID = "123";
 
 const falAiModel = new FalAIModel();
 
+app.get("/pre-sign", (req, res) => {
+  const key = `models/${Date.now()}_${Math.random()}.zip`;
 
-app.get("/pre-sign",(req,res)=>{
-  const url = S3Client.prototype.presign("my-file.txt", {
-    expiresIn: 3600,
-  });
+  const credentials = {
+    accessKeyId: process.env.S3_ACCESS_KEY,
+    secretAccessKey: process.env.S3_SECRET_KEY,
+    bucket: process.env.BUCKET_NAME,
+    endpoint: process.env.ENDPOINT,
+  };
 
-  // find a way to store the zip and get url
+  const url = new S3Client(credentials).presign(key, { expiresIn: 3600 });
 
-  res.json({messgae:"ok"});
-})
+  res.json({ url, key });
+});
 
 //training model
 app.post("/ai/training", async (req, res) => {
@@ -119,12 +123,19 @@ app.post("/pack/generate", async (req, res) => {
     },
   });
 
+  let reqeustId: { request_id: string }[] = await Promise.all(
+    prompt.map((prompt) =>
+      falAiModel.generateImage(prompt.prompt, parsedBody.data.modelId)
+    )
+  );
+
   const images = await prismaClient.outputImages.createManyAndReturn({
-    data: prompt.map((prompt) => ({
+    data: prompt.map((prompt, index) => ({
       userId: USER_ID,
       prompt: prompt.prompt,
       modelId: parsedBody.data?.modelId,
       imageUrl: "",
+      falAiRequestedId: reqeustId[index]?.request_id,
     })),
   });
 
