@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useCallback } from "react";
 import {
   Card,
   CardHeader,
@@ -9,6 +8,9 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import JSZip from "jszip";
+import { BACKEND_URL } from "lib/Utils";
+import axios from "axios";
 
 export function UploadModal() {
   return (
@@ -29,16 +31,35 @@ export function UploadModal() {
             <p className="text-neutral-500">
               <span className="font-medium">Drag and drop files here</span> or
             </p>
-            <Button variant="outline" size="lg" onClick={()=>{
-                const input=document.createElement('input');
-                input.type='file';
-                input.multiple=true;
-                input.accept='image/*';
-                input.onchange=(e)=>{
-                    console.log(input.files);
-                }
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => {
+                const input = document.createElement("input");
+                input.type = "file";
+                input.multiple = true;
+                input.accept = "image/*";
+                input.onchange = async (e) => {
+                  const zip = new JSZip();
+                  const res = await axios.get(`${BACKEND_URL}/pre-sign`);
+                  const url = res.data.url;
+
+                  if (input.files) {
+                    for (const file of input.files) {
+                      const content = await file.arrayBuffer();
+                      zip.file(file.name, content);
+                    }
+                    const content = await zip.generateAsync({ type: "blob" });
+                    const formData = new FormData();
+                    formData.append("file", content);
+                    console.log(content)
+                    const uploadRes = await axios.put(url, formData);
+                    console.log(uploadRes);
+                  }
+                };
                 input.click();
-            }}>
+              }}
+            >
               Browse Files
             </Button>
             <p className="text-xs text-neutral-500">
