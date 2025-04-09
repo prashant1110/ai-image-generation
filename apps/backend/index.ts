@@ -24,7 +24,11 @@ app.get("/pre-sign", (req, res) => {
     endpoint: process.env.ENDPOINT,
   };
 
-  const url = new S3Client(credentials).presign(key, { expiresIn: 3600 });
+  const url = new S3Client(credentials).presign(key, {
+    method: "PUT",
+    expiresIn: 3600,
+    type: "application/zip",
+  });
 
   res.json({ url, key });
 });
