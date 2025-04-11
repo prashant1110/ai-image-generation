@@ -21,9 +21,9 @@ app.get("/pre-sign", (req, res) => {
 
   const credentials = {
     accessKeyId: process.env.S3_ACCESS_KEY,
-    secretAccessKey: process.env.S3_SECRET_KEY,
+    secretAccessKey:process.env.S3_SECRET_KEY,
     bucket: process.env.BUCKET_NAME,
-    endpoint: process.env.ENDPOINT,
+    endpoint:process.env.ENDPOIINT,
   };
 
   const url = new S3Client(credentials).presign(key, {

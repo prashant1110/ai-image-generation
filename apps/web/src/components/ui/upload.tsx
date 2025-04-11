@@ -9,10 +9,14 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import JSZip from "jszip";
-import { BACKEND_URL } from "lib/Utils";
+import { BACKEND_URL, CLOUDFLARE_URL } from "lib/Utils";
 import axios from "axios";
 
-export function UploadModal() {
+export function UploadModal({
+  onUploadDone,
+}: {
+  onUploadDone: (zipUrl: string) => void;
+}) {
   return (
     <Card className="w-full rounded-none border-none mx-auto shadow-none">
       <CardHeader className="border-b pb-4 px-0">
@@ -43,6 +47,7 @@ export function UploadModal() {
                   const zip = new JSZip();
                   const res = await axios.get(`${BACKEND_URL}/pre-sign`);
                   const url = res.data.url;
+                  const key = res.data.key;
 
                   if (input.files) {
                     for (const file of input.files) {
@@ -52,9 +57,8 @@ export function UploadModal() {
                     const content = await zip.generateAsync({ type: "blob" });
                     const formData = new FormData();
                     formData.append("file", content);
-                    console.log(content)
                     const uploadRes = await axios.put(url, formData);
-                    console.log(uploadRes);
+                    onUploadDone(`${CLOUDFLARE_URL}/${key}`);
                   }
                 };
                 input.click();

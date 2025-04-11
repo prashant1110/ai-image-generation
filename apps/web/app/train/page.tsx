@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,8 +20,16 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { UploadModal } from "@/components/ui/upload";
+import { TrainModelInput } from "common/inferred";
 
 const page = () => {
+  const [zipUrl, setZipUrl] = useState("");
+  const [type, setType] = useState("Man");
+  const [age, setAge] = useState();
+  const [ethenicity, setEthenicity] = useState();
+  const [eyeColor, setEyeColor] = useState();
+  const [bald, setBald] = useState(false);
+
   return (
     <div className="flex items-center justify-center h-screen">
       <Card className="w-[450px] p-6">
@@ -103,7 +111,11 @@ const page = () => {
             </div>
           </form>
         </CardContent>
-        <UploadModal/>
+        <UploadModal
+          onUploadDone={(zipUrl) => {
+            setZipUrl(zipUrl);
+          }}
+        />
         <CardFooter className="flex justify-between">
           <Button variant="outline">Cancel</Button>
           <Button>Train Model</Button>
