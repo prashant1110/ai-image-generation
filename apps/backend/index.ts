@@ -13,6 +13,7 @@ const app = express();
 const PORT = 4000;
 const USER_ID = "123";
 app.use(cors());
+app.use(express.json());
 
 const falAiModel = new FalAIModel();
 
@@ -23,7 +24,7 @@ app.get("/pre-sign", (req, res) => {
     accessKeyId: process.env.S3_ACCESS_KEY,
     secretAccessKey:process.env.S3_SECRET_KEY,
     bucket: process.env.BUCKET_NAME,
-    endpoint:process.env.ENDPOIINT,
+    endpoint:process.env.ENDPOINT,
   };
 
   const url = new S3Client(credentials).presign(key, {
