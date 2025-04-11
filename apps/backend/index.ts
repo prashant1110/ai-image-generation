@@ -7,10 +7,13 @@ import {
 import { prismaClient } from "db";
 import { FalAIModel } from "./model/FalAIModel";
 import { S3Client } from "bun";
+import cors from "cors";
 
 const app = express();
 const PORT = 4000;
 const USER_ID = "123";
+app.use(cors());
+app.use(express.json());
 
 const falAiModel = new FalAIModel();
 
@@ -19,12 +22,16 @@ app.get("/pre-sign", (req, res) => {
 
   const credentials = {
     accessKeyId: process.env.S3_ACCESS_KEY,
-    secretAccessKey: process.env.S3_SECRET_KEY,
+    secretAccessKey:process.env.S3_SECRET_KEY,
     bucket: process.env.BUCKET_NAME,
-    endpoint: process.env.ENDPOINT,
+    endpoint:process.env.ENDPOINT,
   };
 
-  const url = new S3Client(credentials).presign(key, { expiresIn: 3600 });
+  const url = new S3Client(credentials).presign(key, {
+    method: "PUT",
+    expiresIn: 3600,
+    type: "application/zip",
+  });
 
   res.json({ url, key });
 });
